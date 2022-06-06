@@ -1,5 +1,4 @@
 /* select from OINV T0 WHERE T0.DocDate >= '[%0]' and T0.DocDate <= '[%1]' */
-
 SELECT
     CP."DocNum",
     'Nota Entrada' as "Tipo de Documento",
@@ -10,8 +9,40 @@ SELECT
     CP."DocDueDate" as "Vencimento",
     NEP."InstlmntID" as "N Parcela",
     NEP."InsTotal" as "Valor Parcela",
-    CPI."SumApplied" as "Valor Recebido",
-    NE."Comments" as "Observacao",    
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" = 'E001' AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor PIS",
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" = 'E002' AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor COFINS",
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" = 'E003' AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor CSLL",
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" in ('E004', 'E005') AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor IR",
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" in ('E007', 'E008') AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor ISS",
+    (
+        select "WTAmnt"
+        from PCH5
+        where "WTCode" = 'E006' AND "AbsEntry" = NE."DocEntry"
+    ) AS "Valor INSS",
+    CPI."DcntSum" as "Desconto",
+    CPI."U_ValorMulta" as "Multa",
+    CPI."SumApplied" as "Valor Pago",
+    NE."Comments" as "Observacao",
     (
         select
             CASE T0."DataSource" WHEN 'I' THEN T1."AcctName" WHEN 'O' THEN T1."AcctName" ELSE NULL END
@@ -48,6 +79,14 @@ SELECT
     CP."DocDueDate" as "Vencimento",
     1 as "N Parcela",
     LC."LocTotal" as "Valor Parcela",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    CPI."DcntSum" as "Desconto",
+    CPI."U_ValorMulta" as "Multa",
     CPI."SumApplied" as "Valor Recebido",
     LC."Memo" as "Observacao",
     (
@@ -66,7 +105,6 @@ FROM
     INNER JOIN VPM2 CPI ON CP."DocEntry" = CPI."DocNum"
     INNER JOIN OJDT LC ON CPI."baseAbs" = LC."TransId"
 WHERE
-    CP."DocDate" BETWEEN [%0]
-    AND [%1]
+    CP."DocDate" BETWEEN [%0] AND [%1]
     AND CP."Canceled" = 'N'
     AND CPI."InvType" = 30

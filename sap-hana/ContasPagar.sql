@@ -44,3 +44,4 @@ WHERE
     LC."DueDate" BETWEEN [%0] AND [%1]
     AND LCI."Credit" > 0
     AND LC."Ref1" IS NULL
+    AND LC."StornoToTr" IS NULL

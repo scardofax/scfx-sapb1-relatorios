@@ -9,6 +9,38 @@ SELECT
     CR."DocDueDate" as "Vencimento",
     NSP."InstlmntID" as "N Parcela",
     NSP."InsTotal" as "Valor Parcela",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" = 'S001' AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor PIS",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" = 'S002' AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor COFINS",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" = 'S003' AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor CSLL",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" in ('S004', 'S005', 'S007') AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor IR",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" in ('S006') AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor ISS",
+    (
+        select "WTAmnt"
+        from INV5
+        where "WTCode" = 'XXXX' AND "AbsEntry" = NS."DocEntry"
+    ) AS "Valor INSS",
+    CRI."DcntSum" as "Desconto",
+    CRI."U_ValorMulta" as "Multa",
     CRI."SumApplied" as "Valor Recebido",
     NS."Comments" as "Observacao",
     (
@@ -26,12 +58,11 @@ FROM
     ORCT CR
     INNER JOIN RCT2 CRI ON CR."DocEntry" = CRI."DocNum"
     INNER JOIN OINV NS ON CRI."baseAbs" = NS."DocEntry"
-    INNER JOIN INV6 NSP ON NS."DocEntry" = NSP."DocEntry"
+    INNER JOIN INV6 NSP ON NS."DocEntry" = NSP."DocEntry"    
     AND CRI."InvoiceId" = NSP."InstlmntID"
     LEFT OUTER JOIN OPYM FP ON NS."PeyMethod" = FP."PayMethCod"
 WHERE
-    CR."DocDate" BETWEEN [%0]
-    AND [%1]
+    CR."DocDate" BETWEEN [%0] AND [%1]
     AND CR."Canceled" = 'N'
     AND CRI."InvType" = 13
 UNION ALL
@@ -45,6 +76,14 @@ SELECT
     CR."DocDueDate" as "Vencimento",
     1 as "N Parcela",
     LC."LocTotal" as "Valor Parcela",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    CRI."DcntSum" as "Desconto",
+    CRI."U_ValorMulta" as "Multa",
     CRI."SumApplied" as "Valor Recebido",
     LC."Memo" as "Observacao",
     (
