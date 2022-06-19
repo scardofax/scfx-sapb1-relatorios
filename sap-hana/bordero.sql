@@ -1,15 +1,17 @@
 select
     "NomePN" as "Nome PN",
-    "Vencimento",
+    "DataVencimento",
     "ValorRecebido" as "Valor Recebido",
     "Observacao",
     "ContaCorrente" as "Conta Corrente",
-    "Filial"
+    "Filial",
+    "DataLancamento"
 from
     (
         select
             CP."CardName" as "NomePN",
-            CP."DocDueDate" as "Vencimento",
+            NEP."DueDate" as "DataVencimento",
+            CP."DocDate" as "DataLancamento",
             CPI."SumApplied" as "ValorRecebido",
             CP."Comments" as "Observacao",
             (
@@ -26,7 +28,10 @@ from
         FROM
             OVPM CP
             INNER JOIN VPM2 CPI ON CP."DocEntry" = CPI."DocNum"
+            INNER JOIN OPCH NE ON CPI."baseAbs" = NE."DocEntry"
+            INNER JOIN PCH6 NEP ON NE."DocEntry" = NEP."DocEntry"
     )
 where
-    "Vencimento" = {?date}
-    AND "ContaCorrente" = {?conta}
+    "DataLancamento" = {?date}
+    AND "ContaCorrente" = '{?conta}'    
+    AND ("NomePN" = '{?pn}' OR '{?pn}' = 'TODOS')

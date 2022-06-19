@@ -11,7 +11,7 @@ select
     CONCAT('Dia ', TO_VARCHAR(N."DocDueDate", 'DD/MM/YYYY')) || ' no valor de R$ ' || cast(N."DocTotal" AS numeric(15, 2)) as "vencimento",
     N."DiscSumSy",
     N."DocTotal",
-    N."Comments",
+    CONCAT(N."Header" || CHAR(13), N."Footer") as "Comments",
     PN."CardCode",
     PN."CardName",
     CONCAT(PNE."AddrType", ' ') || CONCAT(PNE."Street", ', ') || CONCAT(ifnull(PNE."StreetNo", ''), ' - ') || CONCAT(
@@ -34,8 +34,8 @@ from
     INNER JOIN OBPL F ON N."BPLId" = F."BPLId"
     INNER JOIN OCRD PN ON N."CardCode" = PN."CardCode"
     INNER JOIN CRD1 PNE ON PN."CardCode" = PNE."CardCode"
-    INNER JOIN CRD7 PNC ON PNE."CardCode" = PNC."CardCode"
-    and PNE."Address" = PNC."Address"
+    INNER JOIN CRD7 PNC ON PNE."CardCode" = PNC."CardCode"    
 WHERE
     PNE."AdresType" = 'S'
-    AND N."DocEntry" = 115
+    AND PNC."Address" = ''
+    AND N."DocEntry" = {?DocKey@}
