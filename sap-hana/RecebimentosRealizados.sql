@@ -102,7 +102,7 @@ FROM
     INNER JOIN RCT2 CRI ON CR."DocEntry" = CRI."DocNum"
     INNER JOIN OJDT LC ON CRI."baseAbs" = LC."TransId"
 WHERE
-    CR."DocDate" BETWEEN [%0]
-    AND [%1]
+    CR."DocDate" BETWEEN [%0] AND [%1]
     AND CR."Canceled" = 'N'
     AND CRI."InvType" = 30
+    

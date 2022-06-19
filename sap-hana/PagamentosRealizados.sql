@@ -58,12 +58,11 @@ FROM
     OVPM CP
     INNER JOIN VPM2 CPI ON CP."DocEntry" = CPI."DocNum"
     INNER JOIN OPCH NE ON CPI."baseAbs" = NE."DocEntry"
-    INNER JOIN INV6 NEP ON NE."DocEntry" = NEP."DocEntry"
+    INNER JOIN PCH6 NEP ON NE."DocEntry" = NEP."DocEntry"
     AND CPI."InvoiceId" = NEP."InstlmntID"
     LEFT OUTER JOIN OPYM FP ON NE."PeyMethod" = FP."PayMethCod"
 WHERE
-    CP."DocDate" BETWEEN [%0]
-    AND [%1]
+    CP."DocDate" BETWEEN [%0] AND [%1]
     AND CP."Canceled" = 'N'
     AND CPI."InvType" = 18
 
@@ -108,3 +107,4 @@ WHERE
     CP."DocDate" BETWEEN [%0] AND [%1]
     AND CP."Canceled" = 'N'
     AND CPI."InvType" = 30
+    

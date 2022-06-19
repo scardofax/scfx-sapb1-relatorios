@@ -14,7 +14,7 @@ SELECT
     CONCAT(NE."Serial", CONCAT('-', NE."SeriesStr")) as "N Documento"
 FROM
     OPCH NE
-    INNER JOIN INV6 NEP ON NE."DocEntry" = NEP."DocEntry"
+    INNER JOIN PCH6 NEP ON NE."DocEntry" = NEP."DocEntry"
     LEFT OUTER JOIN OPYM FP ON NE."PeyMethod" = FP."PayMethCod"
 WHERE
     NEP."DueDate" BETWEEN [%0] AND [%1]
